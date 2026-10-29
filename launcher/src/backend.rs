@@ -1281,8 +1281,8 @@ fn download_for_owner(
     log: &dyn Fn(String),
 ) -> Result<(), String> {
     let mut accounts = account::Accounts::load();
-    // The strict gate, never `launch_for_game`: the developer option that lets offline names
-    // play without an owner must not download the game for them.
+    // The strict gate, never `launch_for_game`: offline mode (offline names without an owner)
+    // must not download the game for them.
     let pass = account::launch(
         &account::Endpoints::live(),
         account::client_id().as_deref(),
@@ -2175,8 +2175,16 @@ pub fn need_prepared(tag: &str) -> Result<(), String> {
 /// the gate, a sign-in that can't be renewed (no network, expired) still lets the game start,
 /// offline.
 pub fn client(tag: &str) -> Result<Command, String> {
-    let (session, offline) = account::session_for_game(&game_home(), false)
-        .map_err(|refused| format!("{refused} Sign in with `horizon-launcher account sign-in`."))?;
+    // Offline mode (Settings > Account) lets the game start with no owner; with it off, the
+    // owner gate refuses as before.
+    let offline_mode = Settings::load().offline_mode;
+    let (session, offline) =
+        account::session_for_game(&game_home(), offline_mode).map_err(|refused| {
+            format!(
+                "{refused} Sign in with `horizon-launcher account sign-in`, or play without an \
+                 account: `horizon-launcher settings offline-mode on`."
+            )
+        })?;
     need_prepared(tag)?;
     complete_assets(tag);
     crate::browser::horizon::before_play(&game_home());
@@ -2965,12 +2973,18 @@ pub struct Settings {
     /// The player has read what installing a native mod starts (`native_mods::needs_notice`).
     #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     pub native_mods_noticed: bool,
-    /// Developer options (hidden: seven clicks on the sidebar's launcher version reveal them):
-    /// offline names play without an account that owns the game, in the window only
-    /// (`account::Accounts::play_as_with`, `account::launch_for_game`). Never a download: the game still
-    /// comes from the player's own install. Off by default, and absent from the file while off.
-    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
-    pub dev_offline: bool,
+    /// Offline mode (Settings > Account): the game plays without a Microsoft account that owns
+    /// the game, with offline names (`account::Accounts::play_as_with`, `account::launch_for_game`).
+    /// LAN and offline-mode servers only: an online-mode server still needs a signed-in account
+    /// that owns Minecraft: Java Edition. Never a download: the game comes from the player's own
+    /// install (`download_for_owner` keeps the strict gate). Off by default, and absent from the
+    /// file while off. `dev_offline` is the name older developer builds wrote.
+    #[serde(
+        default,
+        alias = "dev_offline",
+        skip_serializing_if = "std::ops::Not::not"
+    )]
+    pub offline_mode: bool,
 }
 
 impl Settings {
@@ -3071,7 +3085,7 @@ mod tests {
 
     /// The launcher downloads Mojang's game files (client jar, libraries, assets) only for an
     /// account the services said owns the game: never without one, and never past the gate by
-    /// the developer option (`Settings::dev_offline`), whose pass has no owner.
+    /// offline mode (`Settings::offline_mode`), whose pass has no owner.
     #[test]
     fn mojang_downloads_only_for_an_owner() {
         let dir = std::env::temp_dir().join(format!("horizon-owner-only-{}", std::process::id()));
@@ -3343,6 +3357,28 @@ mod tests {
             .map(|a| a.to_string_lossy().into_owned())
             .collect();
         assert_eq!(args, ["--server-thread", "--render-distance", "40"]);
+    }
+
+    #[test]
+    fn offline_mode_is_off_unless_turned_on_and_the_old_dev_offline_turns_it_on() {
+        assert!(!Settings::parse("{}").offline_mode);
+        assert!(Settings::parse(r#"{"offline_mode": true}"#).offline_mode);
+        // A developer build's hidden option is the same setting.
+        assert!(Settings::parse(r#"{"dev_offline": true}"#).offline_mode);
+        let old = Settings::parse(r#"{"dev_offline": true, "game_args": "--x"}"#);
+        assert!(old.offline_mode);
+        assert_eq!(old.game_args, "--x");
+        // Off is not written; on is.
+        assert!(!serde_json::to_string(&Settings::default())
+            .unwrap()
+            .contains("offline_mode"));
+        let settings = Settings {
+            offline_mode: true,
+            ..Settings::default()
+        };
+        assert!(serde_json::to_string(&settings)
+            .unwrap()
+            .contains(r#""offline_mode":true"#));
     }
 
     #[test]

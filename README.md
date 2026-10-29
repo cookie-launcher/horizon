@@ -27,6 +27,12 @@ Horizon is Minecraft: Java Edition 26.3 rewritten in Rust: a native game that re
 
 > Not an official Minecraft product. Not approved by or associated with Mojang or Microsoft. Horizon contains no Minecraft code, assets or data: you need your own legally obtained copy of Minecraft: Java Edition 26.3.
 
+> **This fork adds offline mode.** Settings → Account → **Offline mode** (or **Play offline** on
+> the sign-in screen) starts the game with no Microsoft account, as an offline name, for LAN and
+> offline-mode servers. Online-mode servers still need a signed-in account that owns the game,
+> and offline mode downloads nothing: the game still comes from your own install. The design and
+> the exact limits are in [docs/microsoft-account.md](docs/microsoft-account.md#offline-mode-this-fork).
+
 ## Download
 
 Horizon is installed through **the Horizon launcher**. Get it from [playhorizon.dev](https://playhorizon.dev) (the Download button picks your system) or from [the launcher releases](https://github.com/horizon-rust/horizon/releases?q=launcher-v&expanded=true), for Linux x86-64, macOS on Apple Silicon or Windows x64. The launcher installs the game and keeps it up to date with each new build (Horizon ships on one channel, the Nightly), prepares its files from your copy of Minecraft (your own install, or downloaded from Mojang for your account), and updates itself.

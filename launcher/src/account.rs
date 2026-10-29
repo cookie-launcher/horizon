@@ -890,8 +890,8 @@ impl Accounts {
         self.play_as_with(store, who, false)
     }
 
-    /// [`Self::play_as`], where `offline_without_owner` (the window's hidden developer option,
-    /// `backend::Settings::dev_offline`) lets an offline name play without an account that owns
+    /// [`Self::play_as`], where `offline_without_owner` (the window's offline mode,
+    /// `backend::Settings::offline_mode`) lets an offline name play without an account that owns
     /// the game.
     pub fn play_as_with(
         &mut self,
@@ -1084,10 +1084,10 @@ pub fn launch(
     }
 }
 
-/// The owner gate before the game starts. With the window's hidden developer option
-/// (`backend::Settings::dev_offline`, `offline_without_owner`) no owner is no refusal: the game
+/// The owner gate before the game starts. With the window's offline mode
+/// (`backend::Settings::offline_mode`, `offline_without_owner`) no owner is no refusal: the game
 /// starts offline, without a session and without an `owner`. Downloads never come through here:
-/// `backend::download_for_owner` asks [`launch`] itself, so the option never downloads the game.
+/// `backend::download_for_owner` asks [`launch`] itself, so offline mode never downloads the game.
 pub fn launch_for_game(
     ep: &Endpoints,
     client_id: Option<&str>,

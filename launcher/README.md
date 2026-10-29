@@ -404,8 +404,14 @@ and starts nothing. Settings → Accounts signs in: the launcher shows a code, y
 microsoft.com/link, and the launcher checks that the account owns the game. It asks again at every
 Play, with the token renewal; with no network the last answer stands, and a "doesn't own" blocks
 at once. The account also plays online-mode servers under your own name and skin; offline names
-play LAN and offline-mode servers beside it. The game binary started directly (`horizon-client`,
-`horizon-ctl launch`), the harnesses and the servers don't go through this check. Tokens live in the system keychain (Keychain,
+play LAN and offline-mode servers beside it.
+
+**This fork adds offline mode** (Settings → Account → Offline mode, or **Play offline** on the
+gate, or `horizon-launcher settings offline-mode on`): the game starts with no account, as an
+offline name, for LAN and offline-mode servers. Online-mode servers still need a signed-in
+account, and nothing is downloaded for offline mode: the game comes from your own Minecraft
+install, prepared as usual. The game binary started directly (`horizon-client`, `horizon-ctl
+launch`), the harnesses and the servers don't go through this check. Tokens live in the system keychain (Keychain,
 Credential Manager, or the Secret Service on Linux), never in a file, a log or the command line;
 `accounts.json` in the data folder keeps only names and UUIDs. Without a keychain you stay signed
 in until the launcher closes. When the game starts, it gets the session in a private file it
