@@ -192,5 +192,8 @@
   "Delete…": "Supprimer…",
   "Keep": "Garder",
   "Move to Trash": "Mettre à la corbeille",
-  "Move {name} to the Trash, with its worlds and settings? You can get it back from there.": "Mettre {name} à la corbeille, avec ses mondes et ses réglages ? Vous pourrez l'y récupérer."
+  "Move {name} to the Trash, with its worlds and settings? You can get it back from there.": "Mettre {name} à la corbeille, avec ses mondes et ses réglages ? Vous pourrez l'y récupérer.",
+  "Offline mode": "Mode hors ligne",
+  "Or play offline with the Minecraft files already on this computer: LAN and offline-mode servers only.": "Ou jouez hors ligne avec les fichiers Minecraft déjà présents sur cet ordinateur : réseau local et serveurs en mode hors ligne uniquement.",
+  "Play without a Microsoft account: LAN and offline-mode servers only. Online-mode servers still need an account that owns Minecraft: Java Edition, and the game still comes from your own install.": "Jouez sans compte Microsoft : réseau local et serveurs en mode hors ligne uniquement. Les serveurs en mode en ligne nécessitent toujours un compte possédant Minecraft : Java Edition, et le jeu vient toujours de votre propre installation."
 }

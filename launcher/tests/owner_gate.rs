@@ -44,6 +44,52 @@ fn text(out: &Output) -> String {
 }
 
 #[test]
+fn offline_mode_plays_without_an_owner() {
+    let root = home("offline");
+    std::fs::write(
+        root.join("launcher/settings.json"),
+        r#"{"offline_mode":true}"#,
+    )
+    .unwrap();
+    let out = launcher(&root, &["play"]).output().unwrap();
+    let said = text(&out);
+    // Past the gate: the fresh home's version is installed but not prepared, which is as far as
+    // this test can go without Mojang's files.
+    assert!(!said.contains(REFUSED), "{said}");
+    assert!(said.contains("is not prepared yet"), "{said}");
+    assert!(!root.join("game/sessions").exists(), "{said}");
+    let _ = std::fs::remove_dir_all(&root);
+}
+
+#[test]
+fn offline_mode_lets_the_cli_pick_an_offline_name_without_an_owner() {
+    let root = home("cli-offline");
+    // Off by default: an offline name needs an owner.
+    let out = launcher(&root, &["account", "offline", "Builder_1"])
+        .output()
+        .unwrap();
+    assert!(!out.status.success(), "{}", text(&out));
+    assert!(
+        text(&out).contains("Offline names need a Microsoft account"),
+        "{}",
+        text(&out)
+    );
+    // `settings offline-mode on` is the same switch as the window's.
+    let out = launcher(&root, &["settings", "offline-mode", "on"])
+        .output()
+        .unwrap();
+    assert!(out.status.success(), "{}", text(&out));
+    let out = launcher(&root, &["account", "offline", "Builder_1"])
+        .output()
+        .unwrap();
+    assert!(out.status.success(), "{}", text(&out));
+    assert!(text(&out).contains("Builder_1"), "{}", text(&out));
+    let saved = std::fs::read_to_string(root.join("launcher/settings.json")).unwrap();
+    assert!(saved.contains(r#""offline_mode": true"#), "{saved}");
+    let _ = std::fs::remove_dir_all(&root);
+}
+
+#[test]
 fn the_cli_refuses_to_play_without_an_owner() {
     let root = home("cli");
     let out = launcher(&root, &["play"]).output().unwrap();

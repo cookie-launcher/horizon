@@ -192,5 +192,8 @@
   "Keep": "Behalten",
   "Move to Trash": "In den Papierkorb",
   "Install and turn on native mods": "Installieren und native Mods einschalten",
-  "Native mods compile into a game of their own. Installing one turns Native mods on: you then build the game with it in Settings > Native mods. The first build downloads Rust and can take 20 to 30 minutes; later builds are faster.": "Native Mods werden in ein eigenes Spiel kompiliert. Wenn du eine installierst, werden native Mods eingeschaltet: Danach baust du das Spiel damit unter Einstellungen > Native Mods. Der erste Build lädt Rust herunter und kann 20 bis 30 Minuten dauern; spätere Builds sind schneller."
+  "Native mods compile into a game of their own. Installing one turns Native mods on: you then build the game with it in Settings > Native mods. The first build downloads Rust and can take 20 to 30 minutes; later builds are faster.": "Native Mods werden in ein eigenes Spiel kompiliert. Wenn du eine installierst, werden native Mods eingeschaltet: Danach baust du das Spiel damit unter Einstellungen > Native Mods. Der erste Build lädt Rust herunter und kann 20 bis 30 Minuten dauern; spätere Builds sind schneller.",
+  "Offline mode": "Offline-Modus",
+  "Or play offline with the Minecraft files already on this computer: LAN and offline-mode servers only.": "Oder spiele offline mit den Minecraft-Dateien, die bereits auf diesem Computer liegen: nur LAN und Server im Offline-Modus.",
+  "Play without a Microsoft account: LAN and offline-mode servers only. Online-mode servers still need an account that owns Minecraft: Java Edition, and the game still comes from your own install.": "Spiele ohne Microsoft-Konto: nur LAN und Server im Offline-Modus. Server im Online-Modus brauchen weiterhin ein Konto, dem Minecraft: Java Edition gehört, und das Spiel kommt weiterhin aus deiner eigenen Installation."
 }

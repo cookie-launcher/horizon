@@ -13,7 +13,6 @@ mod console;
 mod console_page;
 mod cull;
 mod datapacks_page;
-mod dev_options;
 mod export_page;
 mod game_tools;
 mod import_page;
@@ -217,10 +216,6 @@ struct Launcher {
     owner: Option<bool>,
     /// Play was refused (or Home's Sign in pressed): the owner gate's screen is open.
     owner_screen_open: bool,
-    /// Clicks on the sidebar's launcher version, and whether they revealed the developer options
-    /// (`dev_options`) for this run.
-    dev_clicks: u8,
-    dev_options: bool,
     /// The game is waiting for its session (a token renewal), or a Java instance for its files
     /// and Java (`start_java`), before it starts.
     starting_client: Option<String>,
@@ -432,8 +427,6 @@ impl Launcher {
             keychain: true,
             owner: None,
             owner_screen_open: false,
-            dev_clicks: 0,
-            dev_options: false,
             starting_client: None,
             play_when_prepared: None,
             friend_code: String::new(),
@@ -711,8 +704,8 @@ impl Launcher {
                                 continue;
                             }
                         };
-                        // Past the gate by the developer option alone is no owner.
-                        if !self.settings.dev_offline {
+                        // Past the gate by offline mode alone is no owner.
+                        if !self.settings.offline_mode {
                             self.owner = Some(true);
                         }
                         if let Some(file) = file {
@@ -1203,7 +1196,7 @@ impl Launcher {
         self.starting_client = Some(tag.clone());
         self.play_pressed = Some(Instant::now());
         let tx = self.tx.clone();
-        let offline_without_owner = self.settings.dev_offline;
+        let offline_without_owner = self.settings.offline_mode;
         std::thread::spawn(move || {
             backend::complete_assets(&tag);
             let session = account::session_for_game(&backend::game_home(), offline_without_owner);
@@ -2222,11 +2215,7 @@ impl Launcher {
                 .id("launcher-version")
                 .px(px(8.))
                 .pt(px(6.))
-                .text_color(t.muted)
-                .on_click(cx.listener(|this, _: &ClickEvent, _, cx| {
-                    this.version_clicked();
-                    cx.notify();
-                })),
+                .text_color(t.muted),
         );
         div()
             .id("sidebar")
@@ -3160,6 +3149,30 @@ impl Launcher {
         };
         let mono = |s: String| div().font_family(theme::MONO).child(s).into_any_element();
         let plain = |s: &str| div().child(tr(s).to_string()).into_any_element();
+        // Offline mode: the owner gate off, offline names without an account. Downloads keep
+        // their strict gate (`backend::download_for_owner`).
+        let offline_mode = switch("offline-mode", self.settings.offline_mode, &t).on_click(
+            cx.listener(|this, _: &ClickEvent, _, cx| {
+                this.settings.offline_mode = !this.settings.offline_mode;
+                this.settings.save();
+                cx.notify();
+            }),
+        );
+        let offline_mode_row = index_row(
+            0,
+            tr("Offline mode"),
+            Some(
+                div()
+                    .child(tr(
+                        "Play without a Microsoft account: LAN and offline-mode servers only. \
+                         Online-mode servers still need an account that owns Minecraft: Java \
+                         Edition, and the game still comes from your own install.",
+                    ))
+                    .into_any_element(),
+            ),
+            Some(offline_mode.into_any_element()),
+            &t,
+        );
         let (accounts, n) = self.account_rows(cx);
         let (offline, n) = self.offline_rows(n, cx);
         let appearance = segments(
@@ -3201,6 +3214,7 @@ impl Launcher {
                     .flex()
                     .flex_col()
                     .child(group("Account", "user").mt_0())
+                    .child(offline_mode_row)
                     .child(accounts)
                     .child(offline)
                     .child(group("Updates", "reload"))
@@ -3304,7 +3318,6 @@ impl Launcher {
             )
             .child(self.collection_section(cx))
             .children(self.agents_section(cx))
-            .children(self.dev_options_section(cx))
     }
 
     /// Settings' Game arguments row: the extra arguments the game starts with, kept in
