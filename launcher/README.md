@@ -410,7 +410,8 @@ play LAN and offline-mode servers beside it.
 gate, or `horizon-launcher settings offline-mode on`): the game starts with no account, as an
 offline name, for LAN and offline-mode servers. Online-mode servers still need a signed-in
 account, and nothing is downloaded for offline mode: the game comes from your own Minecraft
-install, prepared as usual. The game binary started directly (`horizon-client`, `horizon-ctl
+install, prepared as usual. The fork's launcher never replaces its own binary, so an upstream
+launcher update can't remove offline mode; Horizon game releases still update as usual. The game binary started directly (`horizon-client`, `horizon-ctl
 launch`), the harnesses and the servers don't go through this check. Tokens live in the system keychain (Keychain,
 Credential Manager, or the Secret Service on Linux), never in a file, a log or the command line;
 `accounts.json` in the data folder keeps only names and UUIDs. Without a keychain you stay signed

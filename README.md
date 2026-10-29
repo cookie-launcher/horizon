@@ -32,6 +32,8 @@ Horizon is Minecraft: Java Edition 26.3 rewritten in Rust: a native game that re
 > offline-mode servers. Online-mode servers still need a signed-in account that owns the game,
 > and offline mode downloads nothing: the game still comes from your own install. The design and
 > the exact limits are in [docs/microsoft-account.md](docs/microsoft-account.md#offline-mode-this-fork).
+> This build never replaces its own launcher binary, so an upstream launcher update can't remove
+> offline mode; Horizon game releases still install and update as usual.
 
 ## Download
 
